@@ -13,17 +13,12 @@
             "allowedValues": [
                 "Public",
                 "Private"
-            ]
+            ],
+	    "defaultValue":"Public"
         },
         "imageName": {
-            "type": "string"
-        },
-        "osType": {
             "type": "string",
-            "allowedValues": [
-                "Linux",
-                "Windows"
-            ]
+	    "defaultValue":"wallarm/node:2.16"
         },
         "numberCpuCores": {
             "type": "string"
@@ -39,26 +34,35 @@
                 "Never"
             ]
         },
-        "environmentVariable0": {
+        "WallarmCloudPassword": {
             "type": "secureString"
         },
-        "environmentVariable1": {
+        "WallarmCloudAccount": {
             "type": "string"
         },
-        "environmentVariable2": {
+        "ProtectedEndpoint": {
             "type": "string"
         },
-        "environmentVariable3": {
-            "type": "string"
+        "WallarmCloud": {
+           "type": "string",
+            "allowedValues": [
+                "us1.api.wallarm.com",
+                "api.wallarm.com"
+            ],
+            "defaultValue":"us1.api.wallarm.com"
         },
-        "environmentVariable4": {
-            "type": "string"
-        },
-        "ipAddressType": {
-            "type": "string"
+        "WallarmRAMCapacity": {
+            "type": "string",
+            "defaultValue":"2"
         },
         "ports": {
             "type": "array"
+            "defaultValue":[
+                {
+                    "port": "80",
+                    "protocol": "TCP"
+                }
+            ]
         },
         "dnsNameLabel": {
             "type": "string"
@@ -85,23 +89,23 @@
                             "environmentVariables": [
                                 {
                                     "name": "DEPLOY_PASSWORD",
-                                    "secureValue": "[parameters('environmentVariable0')]"
+                                    "secureValue": "[parameters('WallarmCloudPassword')]"
                                 },
                                 {
                                     "name": "DEPLOY_USER",
-                                    "value": "[parameters('environmentVariable1')]"
+                                    "value": "[parameters('WallarmCloudAccount')]"
                                 },
                                 {
                                     "name": "NGINX_BACKEND",
-                                    "value": "[parameters('environmentVariable2')]"
+                                    "value": "[parameters('ProtectedEndpoint')]"
                                 },
                                 {
                                     "name": "WALLARM_API_HOST",
-                                    "value": "[parameters('environmentVariable3')]"
+                                    "value": "[parameters('WallarmCloud')]"
                                 },
                                 {
                                     "name": "TARANTOOL_MEMORY_GB",
-                                    "value": "[parameters('environmentVariable4')]"
+                                    "value": "[parameters('WallarmRAMCapacity')]"
                                 }
                             ],
                             "ports": "[parameters('ports')]"
@@ -109,9 +113,9 @@
                     }
                 ],
                 "restartPolicy": "[parameters('restartPolicy')]",
-                "osType": "[parameters('osType')]",
+                "osType": "Linux",
                 "ipAddress": {
-                    "type": "[parameters('ipAddressType')]",
+                    "type": "Public",
                     "ports": "[parameters('ports')]",
                     "dnsNameLabel": "[parameters('dnsNameLabel')]"
                 }
