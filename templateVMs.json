@@ -1,0 +1,773 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmssName": {
+            "type": "string",
+            "metadata": {
+                "description": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended."
+            },
+            "maxLength": 61
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "vmSku": {
+            "type": "string",
+            "defaultValue": "Standard_D2_v2",
+            "metadata": {
+                "description": "Size of VMs in the VM Scale Set."
+            }
+        },
+        "billingMethod": {
+            "type": "string",
+            "allowedValues": [
+                "byol",
+                "hourly"
+            ],
+            "defaultValue": "byol",
+            "metadata": {
+                "description": "Type of Deployment"
+            }
+        },
+        "firmware": {
+            "type": "string",
+            "allowedValues": [
+                "2.16",
+                "latest"
+            ],
+            "defaultValue": "2.16",
+            "metadata": {
+                "description": "Select Wallarm Node version"
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique name for the Storage Account where the machines disks will be placed."
+            },
+            "defaultValue": "[concat(parameters('vmssName'), 'storage')]"
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Type of Storage Account chosen"
+            }
+        },
+        "storageAccountNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Storage Account chosen new or existing"
+            }
+        },
+        "storageAccountResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Resource group of existing storage account(if existing is chosen)"
+            }
+        },
+        "dnsNameForIP": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique DNS Name for the Public IP used to access the WAF."
+            },
+            "defaultValue": "[concat(parameters('vmssName'), '-endpoint')]"
+        },
+        "publicIPAddressName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('vmssName'), '-Pip')]"
+        },
+        "publicIPSku": {
+            "type": "string"
+        },
+        "publicIPAllocation": {
+            "type": "string"
+        },
+        "vNETNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "VNET chosen new or existing"
+            }
+        },
+        "vNETResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "VNET Resource Group Name(if an existing VNET is used)."
+            }
+        },
+        "vNETName": {
+            "type": "string",
+            "defaultValue": "[concat(parameters('vmssName'), '-vnet')]"
+        },
+        "addressPrefix": {
+            "defaultValue": "10.0.0.0/16",
+            "type": "string",
+            "metadata": {
+                "description": "Address prefix of the network for Wallarm VM."
+            }
+        },
+        "subnetPrefix": {
+            "defaultValue": "10.0.0.0/24",
+            "type": "string",
+            "metadata": {
+                "description": "Subnet prefix of the network for Wallarm VM."
+            }
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "instanceCount": {
+            "type": "string",
+            "defaultValue": "2",
+            "metadata": {
+                "description": "Number of VM instances (20 or less)."
+            }
+        },
+        "minInstanceCount": {
+            "type": "string",
+            "defaultValue": "1",
+            "metadata": {
+                "description": "Number of VM instances (20 or less)."
+            }
+        },
+        "maxInstanceCount": {
+            "type": "string",
+            "defaultValue": "4",
+            "metadata": {
+                "description": "Number of VM instances (20 or less)."
+            }
+        },
+        "bootDiagnostics": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Enable boot diagnostics for the vmss instances."
+            }
+        },
+        "scaleUpCpu": {
+            "type": "string",
+            "defaultValue": "85",
+            "metadata": {
+                "description": "Scale up instance when average CPU utilization crosses this %."
+            }
+        },
+        "scaleUpNetworkIn": {
+            "type": "string",
+            "defaultValue": "9175040",
+            "metadata": {
+                "description": "Scale up instance when network in bytes are more than this."
+            }
+        },
+        "scaleUpNetworkOut": {
+            "type": "string",
+            "defaultValue": "9175040",
+            "metadata": {
+                "description": "Scale up instance when network out bytes are more than this."
+            }
+        },
+        "scaleDownCpu": {
+            "type": "string",
+            "defaultValue": "60",
+            "metadata": {
+                "description": "Scale up instance when average CPU utilization crosses this %."
+            }
+        },
+        "scaleDownNetworkIn": {
+            "type": "string",
+            "defaultValue": "5242880",
+            "metadata": {
+                "description": "Scale up instance when network in bytes are more than this."
+            }
+        },
+        "scaleDownNetworkOut": {
+            "type": "string",
+            "defaultValue": "5242880",
+            "metadata": {
+                "description": "Scale up instance when network out bytes are more than this."
+            }
+        },
+        "azureOverprovisioning": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "overprovisioning is true or false."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Admin password on all VMs."
+            }
+        },
+        "wafSharedSecret": {
+            "type": "string",
+            "defaultValue": "secret",
+            "metadata": {
+                "description": "Shared secret to be used when clustering barracuda waf instances."
+            }
+        },
+        "albHealthProbeProtocol": {
+            "type": "string",
+            "allowedValues": [
+                "tcp",
+                "http"
+            ],
+            "defaultValue": "tcp",
+            "metadata": {
+                "description": "Health Probe type."
+            }
+        },
+        "albHealthProbePort": {
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+                "description": "Health Probe Port."
+            }
+        },
+        "albHealthProbePath": {
+            "type": "string",
+            "defaultValue": "/",
+            "metadata": {
+                "description": "Health Probe Path for HTTP based probes."
+            }
+        },
+        "albHealthProbeInterval": {
+            "type": "string",
+            "defaultValue": "10",
+            "metadata": {
+                "description": "Health Probe time interval between probes."
+            }
+        },
+        "albHealthProbeUnhealthyThreshold": {
+            "type": "string",
+            "defaultValue": "5",
+            "metadata": {
+                "description": "The number of consecutive probe failures that must occur before a virtual machine is marked unhealthy."
+            }
+        },
+        "albRuleFrontEndPort": {
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+                "description": "Frontend port for the incoming requests."
+            }
+        },
+        "albRuleBackEndPort": {
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+                "description": "Backend port for forwarding the request to servers."
+            }
+        },
+        "albRulePersistency": {
+            "type": "string",
+            "allowedValues": [
+                "Default",
+                "SourceIP",
+                "SourceIPProtocol"
+            ],
+            "defaultValue": "SourceIPProtocol",
+            "metadata": {
+                "description": "Persistency method to be used by the azure load balancer."
+            }
+        },
+        "WallarmCloudPassword": {
+            "type": "secureString"
+        },
+        "WallarmCloudAccount": {
+            "type": "string"
+        },
+        "ProtectedEndpoint": {
+            "type": "string"
+        },
+        "WallarmCloud": {
+           "type": "string",
+            "allowedValues": [
+                "us1.api.wallarm.com",
+                "api.wallarm.com"
+            ],
+            "defaultValue":"us1.api.wallarm.com"
+        },
+        "WallarmRAMCapacity": {
+            "type": "string",
+            "defaultValue":"2"
+        }
+    },
+    "variables": {
+        "storageAccountTier": "[replace(parameters('storageAccountType'),'_LRS','')]",
+        "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
+        "loadBalancerName": "[concat(variables('namingInfix'), 'lb')]",
+        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]",
+        "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
+        "natPoolName": "[concat(variables('namingInfix'), 'natpool')]",
+        "natPoolNameHttps": "[concat(variables('namingInfix'), 'natpoolHttps')]",
+        "bePoolName": "[concat(variables('namingInfix'), 'bepool')]",
+        "autoScaleName": "[concat(variables('namingInfix'), 'autoscalewad')]",
+        "nicName": "[concat(variables('namingInfix'), 'nic')]",
+        "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
+        "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
+        "emptyArray": [],
+        "wafClusteringMode": "[if(parameters('azureOverprovisioning'), 'ALL_PEER_METHOD', 'MASTER_SLAVE_METHOD')]",
+        "useNewStorageAccount": "[equals(parameters('storageAccountNewOrExisting'), 'new')]",
+        "useNewVnet": "[equals(parameters('vNETNewOrExisting'), 'new')]",
+        "vnetID": "[resourceId(parameters('vNETResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vNETName'))]",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "condition": "[variables('useNewStorageAccount')]",
+            "apiVersion": "2018-07-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "wafStorageName",
+                "provider": "[variables('barracudaNetworksTags').provider]"
+            },
+            "kind": "Storage",
+            "sku": {
+                "name": "[parameters('storageAccountType')]",
+                "tier": "[variables('storageAccountTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "condition": "[variables('useNewVnet')]",
+            "apiVersion": "2018-06-01",
+            "name": "[parameters('vNETName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/',parameters('vmssName'),'NSG')]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('vmssName'),'NSG'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2018-06-01",
+            "name": "[parameters('publicIPAddressName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsNameForIP')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "condition": "[variables('useNewVnet')]",
+            "apiVersion": "2018-06-01",
+            "name": "[concat(parameters('vmssName'),'NSG')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "NSG-WAF",
+                "provider": "[variables('barracudaNetworksTags').provider]"
+            },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "https",
+                        "properties": {
+                            "description": "HTTPS",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1020,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "http",
+                        "properties": {
+                            "description": "HTTP",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1030,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('loadBalancerName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('publicIPAddressID')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[variables('bePoolName')]"
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "WAFLoadBalanceRule",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(variables('lbID'), '/frontendIpConfigurations/', 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(variables('lbID'), '/backendAddressPools/', variables('bePoolName') )]"
+                            },
+                            "probe": {
+                                "id": "[concat(variables('lbID'), '/probes/', 'WAF-Health-Probe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": "[parameters('albRuleFrontEndPort')]",
+                            "backendPort": "[parameters('albRuleBackEndPort')]",
+                            "idleTimeoutInMinutes": 15,
+                            "loadDistribution": "[parameters('albRulePersistency')]"
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "properties": {
+                            "protocol": "[parameters('albHealthProbeProtocol')]",
+                            "port": "[parameters('albHealthProbePort')]",
+                            "requestPath": "[if(equals(parameters('albHealthProbeProtocol'),'http'), parameters('albHealthProbePath'), json('null'))]",
+                            "intervalInSeconds": "[parameters('albHealthProbeInterval')]",
+                            "numberOfProbes": "[parameters('albHealthProbeUnhealthyThreshold')]"
+                        },
+                        "name": "WAF-Health-Probe"
+                    }
+                ],
+                "inboundNatPools": [
+                    ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('namingInfix')]",
+            "location": "[parameters('location')]",
+            "plan": "[variables('imagePlan')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vNETName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('vmSku')]",
+                "tier": "Standard",
+                "capacity": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "overprovision": "[parameters('azureOverprovisioning')]",
+                "upgradePolicy": {
+                    "mode": "Manual"
+                },
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite"
+                        },
+                        "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "18.04-LTS",
+            "version": "latest"
+          }
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "[variables('namingInfix')]",
+                        "adminUsername": "will-be-replaced-by-admin",
+                        "adminPassword": "[parameters('adminPassword')]",
+                        "customData": "[base64(variables('customData'))]"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[variables('nicName')]",
+                                "properties": {
+                                    "primary": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[variables('ipConfigName')]",
+                                            "properties": {
+                                                "subnet": {
+                                                    "id": "[variables('subnetRef')]"
+                                                },
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[concat(variables('lbID'), '/backendAddressPools/', variables('bePoolName'))]"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/autoscalesettings",
+            "apiVersion": "2015-04-01",
+            "name": "[variables('autoScaleName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachineScaleSets/', variables('namingInfix'))]"
+            ],
+            "properties": {
+                "name": "[variables('autoScaleName')]",
+                "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                "enabled": true,
+                "notifications": [
+                    {
+                        "operation": "Scale",
+                        "email": {
+                            "sendToSubscriptionAdministrator": false,
+                            "sendToSubscriptionCoAdministrators": false,
+                            "customEmails": "[if(variables('sendNotifications'), variables('customEmails'), variables('emptyArray'))]"
+                        }
+                    }
+                ],
+                "profiles": [
+                    {
+                        "name": "BWAF_default_profile",
+                        "capacity": {
+                            "minimum": "[parameters('minInstanceCount')]",
+                            "maximum": "[parameters('maxInstanceCount')]",
+                            "default": "[parameters('instanceCount')]"
+                        },
+                        "rules": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Percentage CPU",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT15M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": "[parameters('scaleUpCpu')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Percentage CPU",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT60M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": "[parameters('scaleDownCpu')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Network In",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT15M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": "[parameters('scaleUpNetworkIn')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Network In",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT60M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": "[parameters('scaleDownNetworkIn')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Network Out",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT15M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": "[parameters('scaleUpNetworkOut')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "Network Out",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('namingInfix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT60M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": "[parameters('scaleDownNetworkOut')]"
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+       {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2019-12-01",
+      "name": "[concat(variables('namingInfix'),'/', variables('extensionName'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', variables('namingInfix'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "DockerExtension",
+        "typeHandlerVersion": "1.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "docker": {
+            "port": "2375"
+          },
+          "compose": {
+            "wallarmNode": {
+              "image": "wallarm/node:2.16",
+              "restart": "always",
+              "environmentVariables": [
+                                {
+                                    "name": "DEPLOY_PASSWORD",
+                                    "secureValue": "[parameters('WallarmCloudPassword')]"
+                                },
+                                {
+                                    "name": "DEPLOY_USER",
+                                    "value": "[parameters('WallarmCloudAccount')]"
+                                },
+                                {
+                                    "name": "NGINX_BACKEND",
+                                    "value": "[parameters('ProtectedEndpoint')]"
+                                },
+                                {
+                                    "name": "WALLARM_API_HOST",
+                                    "value": "[parameters('WallarmCloud')]"
+                                },
+                                {
+                                    "name": "TARANTOOL_MEMORY_GB",
+                                    "value": "[parameters('WallarmRAMCapacity')]"
+                                }
+                            ],
+              "ports": [
+                "80:80"
+              ]
+            }
+          }
+        }
+      }
+    },
+        {
+            "name": "pid-14d7ae0f-e0bd-413c-8bb4-adbdca0e3bdd",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-07-01",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        }
+    ]
+}
