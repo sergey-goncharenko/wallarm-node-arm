@@ -381,10 +381,6 @@
             "apiVersion": "2018-06-01",
             "name": "[concat(parameters('vmssName'),'NSG')]",
             "location": "[parameters('location')]",
-            "tags": {
-                "displayName": "NSG-WAF",
-                "provider": "[variables('barracudaNetworksTags').provider]"
-            },
             "properties": {
                 "securityRules": [
                     {
