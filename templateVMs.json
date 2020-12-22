@@ -23,10 +23,10 @@
         "billingMethod": {
             "type": "string",
             "allowedValues": [
-                "18.04-LTS",
+                "16.04-LTS",
                 "hourly"
             ],
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "16.04-LTS",
             "metadata": {
                 "description": "Type of Deployment"
             }
