@@ -23,10 +23,10 @@
         "billingMethod": {
             "type": "string",
             "allowedValues": [
-                "byol",
+                "18.04-LTS",
                 "hourly"
             ],
-            "defaultValue": "byol",
+            "defaultValue": "18.04-LTS",
             "metadata": {
                 "description": "Type of Deployment"
             }
