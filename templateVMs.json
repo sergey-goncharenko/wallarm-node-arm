@@ -85,12 +85,6 @@
             "type": "string",
             "defaultValue": "[concat(parameters('vmssName'), '-Pip')]"
         },
-        "publicIPSku": {
-            "type": "string"
-        },
-        "publicIPAllocation": {
-            "type": "string"
-        },
         "vNETNewOrExisting": {
             "type": "string",
             "defaultValue": "new",
@@ -128,7 +122,8 @@
             }
         },
         "subnetName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[concat(parameters('vmssName'), '-subnet1')]"
         },
         "instanceCount": {
             "type": "string",
@@ -334,10 +329,6 @@
             "apiVersion": "2018-07-01",
             "name": "[parameters('storageAccountName')]",
             "location": "[parameters('location')]",
-            "tags": {
-                "displayName": "wafStorageName",
-                "provider": "[variables('barracudaNetworksTags').provider]"
-            },
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('storageAccountType')]",
@@ -755,19 +746,6 @@
           }
         }
       }
-    },
-        {
-            "name": "pid-14d7ae0f-e0bd-413c-8bb4-adbdca0e3bdd",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2018-07-01",
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": []
-                }
-            }
-        }
+    }
     ]
 }
