@@ -320,7 +320,17 @@
         "useNewStorageAccount": "[equals(parameters('storageAccountNewOrExisting'), 'new')]",
         "useNewVnet": "[equals(parameters('vNETNewOrExisting'), 'new')]",
         "vnetID": "[resourceId(parameters('vNETResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vNETName'))]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]"
+        "imagePublisher": "Canonical",
+        "imageVersion": "latest",
+        "imageSKU": "[parameters('billingMethod')]",
+        "imageOffer": "UbuntuServer",
+        "imagePlan": {
+            "name": "[variables('imageSKU')]",
+            "product": "[variables('imageOffer')]",
+            "publisher": "[variables('imagePublisher')]"
+        },
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
+        "extensionName": "DockerExtension"
     },
     "resources": [
         {
