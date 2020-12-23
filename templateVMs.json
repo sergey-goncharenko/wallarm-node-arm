@@ -23,10 +23,11 @@
         "billingMethod": {
             "type": "string",
             "allowedValues": [
+                "18.04-LTS",
                 "16.04-LTS",
                 "hourly"
             ],
-            "defaultValue": "16.04-LTS",
+            "defaultValue": "18.04-LTS",
             "metadata": {
                 "description": "Type of Deployment"
             }
@@ -487,7 +488,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2018-06-01",
+            "apiVersion": "2020-06-01",
             "name": "[variables('namingInfix')]",
             "location": "[parameters('location')]",
             "plan": "[variables('imagePlan')]",
@@ -496,8 +497,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('vNETName'))]"
             ],
             "sku": {
-                "name": "[parameters('vmSku')]",
-                "tier": "Standard",
+                "name": "Standard_D2_v2",
                 "capacity": "[parameters('instanceCount')]"
             },
             "properties": {
@@ -509,20 +509,26 @@
                     "storageProfile": {
                         "osDisk": {
                             "createOption": "FromImage",
-                            "caching": "ReadWrite"
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "StandardSSD_LRS"
+                            }
                         },
                         "imageReference": {
-            "publisher": "Canonical",
-            "offer": "UbuntuServer",
-            "sku": "18.04-LTS",
-            "version": "latest"
-          }
+                             "publisher": "Canonical",
+                             "offer": "UbuntuServer",
+                             "sku": "18.04-LTS",
+                             "version": "latest"
+                         }
                     },
+                    "priority": "Regular",
                     "osProfile": {
                         "computerNamePrefix": "[variables('namingInfix')]",
                         "adminUsername": "will-be-replaced-by-admin",
                         "adminPassword": "[parameters('adminPassword')]",
-                        "customData": "[base64(variables('customData'))]"
+                        "linuxConfiguration": {
+                            "disablePasswordAuthentication": true
+                        }
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
