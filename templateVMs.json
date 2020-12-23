@@ -596,33 +596,21 @@
             "wallarmNode": {
               "image": "wallarm/node:2.16",
               "restart": "always",
-              "environmentVariables": [
-                                {
-                                    "name": "DEPLOY_PASSWORD",
-                                    "secureValue": "[parameters('WallarmCloudPassword')]"
-                                },
-                                {
-                                    "name": "DEPLOY_USER",
-                                    "value": "[parameters('WallarmCloudAccount')]"
-                                },
-                                {
-                                    "name": "NGINX_BACKEND",
-                                    "value": "[parameters('ProtectedEndpoint')]"
-                                },
-                                {
-                                    "name": "WALLARM_API_HOST",
-                                    "value": "[parameters('WallarmCloud')]"
-                                },
-                                {
-                                    "name": "TARANTOOL_MEMORY_GB",
-                                    "value": "[parameters('WallarmRAMCapacity')]"
-                                }
-                            ],
               "ports": [
                 "80:80"
               ]
             }
-          }
+			
+          },
+		  "compose-environment": {
+              "DEPLOY_PASSWORD":"[parameters('WallarmCloudPassword')]",
+			  "DEPLOY_USER":"[parameters('WallarmCloudAccount')]",
+              "NGINX_BACKEND":"[parameters('ProtectedEndpoint')]",
+			  "WALLARM_API_HOST":"[parameters('WallarmCloud')]",
+			  "TARANTOOL_MEMORY_GB":"[parameters('WallarmRAMCapacity')]"
+            }
+                            
+		  
         }
                   }
                 }
