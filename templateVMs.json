@@ -550,7 +550,56 @@
                                 }
                             }
                         ]
-                    }
+                    },
+                    "extensionProfile": {
+              "extensions": [
+                {
+                  "name": "lapextension",
+                  "properties": {
+                    "publisher": "Microsoft.Azure.Extensions",
+                    "type": "DockerExtension",
+                    "typeHandlerVersion": "1.0",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+          "docker": {
+            "port": "2375"
+          },
+          "compose": {
+            "wallarmNode": {
+              "image": "wallarm/node:2.16",
+              "restart": "always",
+              "environmentVariables": [
+                                {
+                                    "name": "DEPLOY_PASSWORD",
+                                    "secureValue": "[parameters('WallarmCloudPassword')]"
+                                },
+                                {
+                                    "name": "DEPLOY_USER",
+                                    "value": "[parameters('WallarmCloudAccount')]"
+                                },
+                                {
+                                    "name": "NGINX_BACKEND",
+                                    "value": "[parameters('ProtectedEndpoint')]"
+                                },
+                                {
+                                    "name": "WALLARM_API_HOST",
+                                    "value": "[parameters('WallarmCloud')]"
+                                },
+                                {
+                                    "name": "TARANTOOL_MEMORY_GB",
+                                    "value": "[parameters('WallarmRAMCapacity')]"
+                                }
+                            ],
+              "ports": [
+                "80:80"
+              ]
+            }
+          }
+        }
+                  }
+                }
+              ]
+            }
                 }
             }
         },
@@ -701,57 +750,7 @@
                     }
                 ]
             }
-        },
-       {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2019-12-01",
-      "name": "[concat(variables('namingInfix'),'/', variables('extensionName'))]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachineScaleSets/', variables('namingInfix'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "DockerExtension",
-        "typeHandlerVersion": "1.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "docker": {
-            "port": "2375"
-          },
-          "compose": {
-            "wallarmNode": {
-              "image": "wallarm/node:2.16",
-              "restart": "always",
-              "environmentVariables": [
-                                {
-                                    "name": "DEPLOY_PASSWORD",
-                                    "secureValue": "[parameters('WallarmCloudPassword')]"
-                                },
-                                {
-                                    "name": "DEPLOY_USER",
-                                    "value": "[parameters('WallarmCloudAccount')]"
-                                },
-                                {
-                                    "name": "NGINX_BACKEND",
-                                    "value": "[parameters('ProtectedEndpoint')]"
-                                },
-                                {
-                                    "name": "WALLARM_API_HOST",
-                                    "value": "[parameters('WallarmCloud')]"
-                                },
-                                {
-                                    "name": "TARANTOOL_MEMORY_GB",
-                                    "value": "[parameters('WallarmRAMCapacity')]"
-                                }
-                            ],
-              "ports": [
-                "80:80"
-              ]
-            }
-          }
         }
-      }
-    }
+       
     ]
 }
