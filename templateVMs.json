@@ -432,6 +432,20 @@
                             "priority": 1030,
                             "direction": "Inbound"
                         }
+                    },
+                    {
+                        "name": "ssh",
+                        "properties": {
+                            "description": "SSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1040,
+                            "direction": "Inbound"
+                        }
                     }
                 ]
             }
@@ -602,7 +616,7 @@
             }
 			
           },
-		  "compose-environment": {
+		  "environment": {
               "DEPLOY_PASSWORD":"[parameters('WallarmCloudPassword')]",
 			  "DEPLOY_USER":"[parameters('WallarmCloudAccount')]",
               "NGINX_BACKEND":"[parameters('ProtectedEndpoint')]",
@@ -611,7 +625,16 @@
             }
                             
 		  
-        }
+        },
+		"protectedSettings":{
+			"environment": {
+              "DEPLOY_PASSWORD":"[parameters('WallarmCloudPassword')]",
+			  "DEPLOY_USER":"[parameters('WallarmCloudAccount')]",
+              "NGINX_BACKEND":"[parameters('ProtectedEndpoint')]",
+			  "WALLARM_API_HOST":"[parameters('WallarmCloud')]",
+			  "TARANTOOL_MEMORY_GB":"[parameters('WallarmRAMCapacity')]"
+            }
+		}
                   }
                 }
               ]
