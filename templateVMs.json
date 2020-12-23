@@ -331,7 +331,19 @@
             "publisher": "[variables('imagePublisher')]"
         },
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
-        "extensionName": "DockerExtension"
+        "extensionName": "DockerExtension",
+		"lbName": "[concat(variables('vmssName'), 'lb')]",
+		"bepoolName": "[concat(variables('lbName'), 'bepool')]",
+		"fepoolName": "[concat(variables('lbName'), 'fepool')]",
+		"bepoolID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('bepoolName'))]",
+		"feIpConfigName": "[concat(variables('fepoolName'), 'IpConfig')]",
+		"feIpConfigId": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('lbName'), variables('feIpConfigName'))]",
+		"pipName": "[concat(variables('vmssName'), 'pip')]",
+		"nicName": "[concat(variables('vmssName'), 'nic')]",
+		"natPoolName": "[concat(variables('lbName'), 'natpool')]",
+		"ipConfigName": "[concat(variables('vmssName'), 'ipconfig')]",
+		"httpProbeName": "httpProbe",
+		"httpsProbeName": "httpsProbe"
     },
     "resources": [
         {
@@ -483,6 +495,18 @@
                     }
                 ],
                 "inboundNatPools": [
+				        {
+							"name": "[variables('natPoolName')]",
+							"properties": {
+							  "frontendIPConfiguration": {
+								"id": "[variables('feIpConfigId')]"
+							  },
+							  "protocol": "Tcp",
+							  "frontendPortRangeStart": 10022,
+							  "frontendPortRangeEnd": 11022,
+							  "backendPort": 22
+							}
+						}
                     ]
             }
         },
@@ -543,7 +567,12 @@
                                                     {
                                                         "id": "[concat(variables('lbID'), '/backendAddressPools/', variables('bePoolName'))]"
                                                     }
-                                                ]
+                                                ],
+												"loadBalancerInboundNatPools": [
+													  {
+														"id": "[resourceId('Microsoft.Network/loadBalancers/inboundNatPools', variables('lbName'), variables('natPoolName'))]"
+													  }
+												]
                                             }
                                         }
                                     ]
