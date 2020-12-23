@@ -599,7 +599,13 @@
                   }
                 }
               ]
-            }
+            },
+                    "diagnosticsProfile": {
+                        "bootDiagnostics": {
+                            "enabled": "[parameters('bootDiagnostics')]",
+                            "storageUri": "[reference(resourceId(parameters('storageAccountResourceGroup'), 'Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2017-06-01').primaryEndpoints.blob]"
+                        }
+                    }
                 }
             }
         },
