@@ -570,9 +570,7 @@
                     {
                         "operation": "Scale",
                         "email": {
-                            "sendToSubscriptionAdministrator": false,
-                            "sendToSubscriptionCoAdministrators": false,
-                            "customEmails": "[if(variables('sendNotifications'), variables('customEmails'), variables('emptyArray'))]"
+                            "sendToSubscriptionAdministrator": true
                         }
                     }
                 ],
