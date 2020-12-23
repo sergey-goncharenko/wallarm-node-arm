@@ -336,8 +336,7 @@
 		"bepoolName": "[concat(variables('lbName'), 'bepool')]",
 		"fepoolName": "[concat(variables('lbName'), 'fepool')]",
 		"bepoolID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('bepoolName'))]",
-		"feIpConfigName": "[concat(variables('fepoolName'), 'IpConfig')]",
-		"feIpConfigId": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('lbName'), variables('feIpConfigName'))]",
+		"feIpConfigId": "[concat(variables('lbID'), '/frontendIpConfigurations/', 'LoadBalancerFrontend')]",
 		"pipName": "[concat(parameters('vmssName'), 'pip')]",
 		"nicName": "[concat(parameters('vmssName'), 'nic')]",
 		"natPoolName": "[concat(variables('lbName'), 'natpool')]",
@@ -570,7 +569,7 @@
                                                 ],
 												"loadBalancerInboundNatPools": [
 													  {
-														"id": "[resourceId('Microsoft.Network/loadBalancers/inboundNatPools', variables('lbName'), variables('natPoolName'))]"
+														"id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
 													  }
 												]
                                             }
