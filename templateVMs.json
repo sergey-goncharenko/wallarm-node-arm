@@ -491,7 +491,6 @@
             "apiVersion": "2020-06-01",
             "name": "[variables('namingInfix')]",
             "location": "[parameters('location')]",
-            "plan": "[variables('imagePlan')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('vNETName'))]"
