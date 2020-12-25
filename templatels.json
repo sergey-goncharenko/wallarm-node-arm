@@ -1,0 +1,122 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerGroups_sglogstash_name": {
+            "defaultValue": "sglogstash",
+            "type": "String"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "http_user": {
+            "type": "string",
+            "defaultValue": "admin"
+        },
+        "http_passwd": {
+            "type": "string",
+            "defaultValue": "wallarm"
+        },
+        "http_port": {
+            "type": "string",
+            "defaultValue": "5044"
+        },
+        "LA_WorkspaceID": {
+            "type": "string",
+            "defaultValue": "3cf6aacf-df83-48f8-8a24-bc09a4bfed59"
+        },
+        "LA_WorkspaceKey": {
+            "type": "string",
+            "defaultValue": "b1GO8S7qhzW3Rfgib/KsCBngEUBLszXUvac3m3N5L25sH7KrOQ60RKtDGPuza9VpV0+wmQDgs4hpxcOQfrTZtA=="
+        },
+        "ssl_cert_base64": {
+            "type": "string",
+            "defaultValue": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURqRENDQW5TZ0F3SUJBZ0lVS1FKZGFZWnhObURpZzU4V1YreEd4aEFiK0p3d0RRWUpLb1pJaHZjTkFRRUwKQlFBd1N6RUxNQWtHQTFVRUJoTUNRMEV4Q3pBSkJnTlZCQWdNQWxGRE1SWXdGQVlEVlFRS0RBMURiMjF3WVc1NQpMQ0JKYm1NdU1SY3dGUVlEVlFRRERBNXNiMmR6ZEdGemFDNXNiMk5oYkRBZUZ3MHlNREV5TWpVd09UUTJNVGRhCkZ3MHpNREV5TWpNd09UUTJNVGRhTUVzeEN6QUpCZ05WQkFZVEFrTkJNUXN3Q1FZRFZRUUlEQUpSUXpFV01CUUcKQTFVRUNnd05RMjl0Y0dGdWVTd2dTVzVqTGpFWE1CVUdBMVVFQXd3T2JHOW5jM1JoYzJndWJHOWpZV3d3Z2dFaQpNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUMxSlZGTUNWbm9SUDE2c2dPejNhcURQOXZGCjk2bjErRWhlTno4K3o5Nnc4OHdXVGVIRlp3bHdWNnVpRXh1Qy9BVzU1WkZmbm1KZExySFpPNDZqNGtDRzhWT28KZ3ZHT0o4WlBZbnc2eUpxV2N3WnJvWWhJVVB6UFJYdkJlblRzWTdUdVh2MTBBWUlRNkRJajRVK1lsVmd5bjZPMwpGV2F3RW9vQ2lBU29FeCtUcmR1b1lOMnJpcU4yZTJoUUR1SzA5RUUrTnR4UGo1YVhTd2krbFV3OTVCYm1qY3QwCmd5ejgvQzNGa3ZJakNURlJRSkxHMFJBQjBLUEJDMmhaZ2hiZGg2b1lsNHMrU1NENGhJTm04RTA4YjNaUUE3VUkKR1RBNGpJK0VIU3d6RVJydDdVZmhvblo5OFBLYmdXVGdmdW5xdkpiQVRSdVZETlJ1YkNpM1VienYrU0svQWdNQgpBQUdqYURCbU1CMEdBMVVkRGdRV0JCU1FLalM0eElyc0M4bGpxcDJwQUVJVk92aE55ekFmQmdOVkhTTUVHREFXCmdCU1FLalM0eElyc0M4bGpxcDJwQUVJVk92aE55ekFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQk1HQTFVZEVRUU0KTUFxQ0NHeHZaM04wWVhOb01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQ3BJb2FTekpZTmg2Y0xxdTBaLzJqNwpHcGhrNzUzckZuT1FwcXBudnFyNExveVJ0UUhqcHZNVHlEUlhHdTdIYW9uN3ROVUJJd2EwMTFRVjlPUmJGeUF5CjFmMlNKTTVvQWx0RVkvWGg4STMyL3kxdWZmODhJelphUk1YTk9TUkY0WCtWb2lvdTBndmszZDdEVEZWNUlPblIKc242eWVRM3N6Wmt4eTV1RGdUM1NrTGY3MlNGTDhuclFCUFVBTk9tditvQkFLZEY0VWhTTDR0bmxnaVVEOVU5bAplOE9rNHA0RUFEV2EycHB6cjd4TjAvWWNwMnpjOXQ4SU9Qb2FWcTFTYVJoczAzRHZCMzh2SHRsaFVkRFprRFdvCkRvaCtESWR0WjA3N0hLd3ozU3pHb1BpelBVWjhZaE5FTnkrbTZJb0xqOEd6blhLQUYvYzIxV1dUNklmRzJrZkoKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+        },
+        "ssl_key_base64": {
+            "type": "string",
+            "defaultValue": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQzFKVkZNQ1Zub1JQMTYKc2dPejNhcURQOXZGOTZuMStFaGVOejgrejk2dzg4d1dUZUhGWndsd1Y2dWlFeHVDL0FXNTVaRmZubUpkTHJIWgpPNDZqNGtDRzhWT29ndkdPSjhaUFludzZ5SnFXY3dacm9ZaElVUHpQUlh2QmVuVHNZN1R1WHYxMEFZSVE2RElqCjRVK1lsVmd5bjZPM0ZXYXdFb29DaUFTb0V4K1RyZHVvWU4ycmlxTjJlMmhRRHVLMDlFRStOdHhQajVhWFN3aSsKbFV3OTVCYm1qY3QwZ3l6OC9DM0ZrdklqQ1RGUlFKTEcwUkFCMEtQQkMyaFpnaGJkaDZvWWw0cytTU0Q0aElObQo4RTA4YjNaUUE3VUlHVEE0akkrRUhTd3pFUnJ0N1VmaG9uWjk4UEtiZ1dUZ2Z1bnF2SmJBVFJ1VkROUnViQ2kzClVienYrU0svQWdNQkFBRUNnZ0VCQUpybXdIQlBCc3p5UWZmcnhmTEhPUXBuVHg0b3ZQUVRUbjhTcTBpaEpRTVkKVjRzektqOU43dXBjYmU1NGZHd3o2d21lWUFQdVFwc0FWU0U0SnEvSngvZ2M0YmNWMGs0SGdUTmRPbkppSEo5TwoyVXlzb3dlRUNjdU0xVmtMeUhSa2h0SFg5TkNBZ2FMSGpDaldnT1F2d1czNHlWekVOajJXZk9IUlFub2ZjRDh0CldLbUZEa2ZyTUZsRzlleGo1RUpIVm5ZM0daUk1SUlVHdVVOd21SWko4c3BLQjBOc1BhaTJSY0RpbzlVeFZqV3EKTXRNV1BPUVJLckMwTkltYUdzNFB4THdKdGNMdjJ0S203R3MwN0ZpRXZLVWVGY1g0b2JTUkYrSUUwMW1zcjZGMwpQUFU4VDVVRG1tZzY3TmxJSzJPR0JmN1F2NW1OY0MxdU9XQXMrSDNueTFFQ2dZRUE3ZTQvbzBoYndURUJsOG4vCkV2L0pEYkttcHVheExkamtuOHAvRC9SUEw1L281V2U1ZE1rNmtIcVd2bWF0YlRMdnZRVm0veGp6aEVDVmVlY24KL2ZFVFIzSTNtMUhQQmR5b0twcTJTRlhwajl4c08wVmowbWJlTThDTkdUZFBBM1czZlQvYm5CNStWRm5XdnlvMwp0MTNQRGNaT1VaaUw2RExDQXFGbENIM1F6MlVDZ1lFQXd1Y1VpZ0RXSXEvdWhZTEt1eWFoY2YzbkJSZVJjMFdLCmJEdUg4dTR1S2dOdFF5eitvVjN3QTVvTDNmZTh0Z0lDczU0VzlMYnF2Y3IxOElEUHNiUk5WL1BZbHBSdENJcksKa0RVQVdIaFdmMDZEczRTbFRvNTBhQjZ1bkF4ekVZTWZxWVZaVHY4OWZGOHdKWloyUHF6bHZvY3BVd2pBRUIyRgo2N3R1VUhkMGdWTUNnWUIyUHFOTnlKWWhDdlBadGIrWWQ1bzV2b0ZvRE5vZENOK0dNaUsza1JrUmVBMU1oU0g3CjBrM1NvN25xNGlocVRwZ3FmbGJUakZqcGJ4ZGFQL0QyR1NzVnBNUFI0dlJaMjNHUHl0ZXdWMUg5OXZPcStTOUUKejI2NmxZVUo5UnpGZ1dreFM5MGVWMkU5Rm5ETkRIUW9JdXpWMGFuMmp6Tm9zR0VPNFpyT2Y0aVlxUUtCZ0R2QQpsRzlxcWp1Z0xFUUtRUlQzVnUrWG84ZlAzZXUxR2lic2FWVjA1L3BCYXJINWpXYnpZYTM1QUVKZ3ZSNGZwNnhoCmZ6QXZFL0J6MU1xUzh4bkw2UnBaeThEK2FCOENUZS9BRUFjUGZaVXlBUFo4YUNHWlV0N0k2VWMyR2VENGpqQnUKalY3R3FaY0RwOE1lU2NvVlA2b1Z6Zm1DNlQ4SGpoTWpOMEs4SEorNUFvR0JBS09naGMveWNCdW5VQldtMEV4KwpKUTNaZHlySTJ5L0JhMUhTSGV4RkVNN1dodXo5VUdHWnhKSkF4cmFwODgrUDhJbFk0azhScXBqMG5ieWpSN21yCndCWEloRDc4TTViTFM0OE90bE5QaGVnUml1dGFMSXBnRFpuaDRqUXhoSWc1cmxZSjBWTGlza1ZQeFU0U3BBS3cKb0ZCb0hlZ25aNFV6T2YyRE1JZnZWazloCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2019-12-01",
+            "name": "[parameters('containerGroups_sglogstash_name')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "sku": "Standard",
+                "containers": [
+                    {
+                        "name": "[parameters('containerGroups_sglogstash_name')]",
+                        "properties": {
+                            "image": "logstash:7.10.1",
+                            "ports": [
+                                {
+                                    "protocol": "TCP",
+                                    "port": "[parameters('http_port')]"
+                                }
+                            ],
+                            "command": ["/bin/bash", "-c", "logstash-plugin install microsoft-logstash-output-azure-loganalytics; /usr/local/bin/docker-entrypoint"],
+
+                            "environmentVariables": [
+                                {
+                                    "name": "CONFIG_STRING",
+                                    "value": "[concat('input {\n http {\n port => 5044\n ssl => true\n ssl_certificate => \"/mnt/secrets/sslcertificateData\"\n ssl_key => \"/mnt/secrets/sslcertificateKey\"\n user => \"',parameters('http_user'),'\"\n password => \"',parameters('http_passwd'),'\"\n}\n}\n filter {}\n output {\n microsoft-logstash-output-azure-loganalytics {\n workspace_id => \"',parameters('LA_WorkspaceID'),'\"\n workspace_key => \"',parameters('LA_WorkspaceKey'),'\"\n custom_log_table_name => \"wallarm\"\n}\n }')]"
+                                },
+                                {
+                                    "name": "CONFIG_SUPPORT_ESCAPES",
+                                    "value": "true"
+                                },
+                                {
+                                    "name": "CONFIG_DEBUG",
+                                    "value": "true"
+                                },
+                                {
+                                    "name": "MONITORING_ENABLED",
+                                    "value": "false"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "memoryInGB": 1.5,
+                                    "cpu": 1
+                                }
+                            },
+              "volumeMounts": [
+                {
+                  "name": "certmount",
+                  "mountPath": "/mnt/secrets",
+                  "readOnly": false
+                }]
+                        }
+                    }
+                ],
+                "initContainers": [],
+                "restartPolicy": "OnFailure",
+                "ipAddress": {
+                    "ports": [
+                        {
+                            "protocol": "TCP",
+                            "port": "[parameters('http_port')]"
+                        }
+                    ],
+                    "type": "Public",
+                    "dnsNameLabel": "[parameters('containerGroups_sglogstash_name')]"
+                },
+        "volumes": [
+          {
+            "name": "certmount",
+            "secret": {
+              "sslcertificateData": "[parameters('ssl_cert_base64')]",
+              "sslcertificateKey": "[parameters('ssl_key_base64')]"
+            }
+          }
+        ],
+                "osType": "Linux"
+            }
+        }
+    ]
+}
