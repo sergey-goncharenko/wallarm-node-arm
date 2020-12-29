@@ -615,7 +615,7 @@
 										"fileUris": "[variables('Script URLs')]"
 									},
 									"protectedSettings": {
-										"commandToExecute": "[concat(variables('Command'),' ',parameters('WallarmCloudAccount'),' ',parameters('WallarmCloudPassword'),' ',parameters('ProtectedEndpoint'),' ',parameters('WallarmRAMCapacity'),' ',parameters('WallarmPort'),' wallarm/node:',parameters('firmware'))]"
+										"commandToExecute": "[concat(variables('Command'),' ',parameters('WallarmCloudAccount'),' ',parameters('WallarmCloudPassword'),' ',parameters('ProtectedEndpoint'),' ',parameters('WallarmRAMCapacity'),' ',parameters('WallarmPort'),' wallarm/node:',parameters('firmware'),' ',parameters('WallarmCloud'))]"
 									}
 								}
 							}
