@@ -302,6 +302,11 @@
             "type": "string",
             "defaultValue":"2"
         }
+		,
+        "WallarmPort": {
+            "type": "string",
+            "defaultValue":"80"
+        }
     },
     "variables": {
         "storageAccountTier": "[replace(parameters('storageAccountType'),'_LRS','')]",
@@ -342,7 +347,13 @@
 		"natPoolName": "[concat(variables('lbName'), 'natpool')]",
 		"ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
 		"httpProbeName": "httpProbe",
-		"httpsProbeName": "httpsProbe"
+		"httpsProbeName": "httpsProbe",
+		"Script URLs": [
+		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/install-docker-ubuntu.sh",
+		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/install-azure-cli-ubuntu.sh",
+		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/bootstrap-ubuntu.sh"
+		],
+		"Command": "sh install-docker-ubuntu.sh"
     },
     "resources": [
         {
@@ -594,51 +605,24 @@
                         ]
                     },
                     "extensionProfile": {
-              "extensions": [
-                {
-                  "name": "lapextension",
-                  "properties": {
-                    "publisher": "Microsoft.Azure.Extensions",
-                    "type": "DockerExtension",
-                    "typeHandlerVersion": "1.0",
-                    "autoUpgradeMinorVersion": true,
-                    "settings": {
-          "docker": {
-            "port": "2375"
-          },
-          "compose": {
-            "wallarmNode": {
-              "image": "wallarm/node:2.16",
-              "restart": "always",
-              "ports": [
-                "80:80"
-              ]
-            }
-			
-          },
-		  "environment": {
-              "DEPLOY_PASSWORD":"[parameters('WallarmCloudPassword')]",
-			  "DEPLOY_USER":"[parameters('WallarmCloudAccount')]",
-              "NGINX_BACKEND":"[parameters('ProtectedEndpoint')]",
-			  "WALLARM_API_HOST":"[parameters('WallarmCloud')]",
-			  "TARANTOOL_MEMORY_GB":"[parameters('WallarmRAMCapacity')]"
-            }
-                            
-		  
-        },
-		"protectedSettings":{
-			"environment": {
-              "DEPLOY_PASSWORD":"[parameters('WallarmCloudPassword')]",
-			  "DEPLOY_USER":"[parameters('WallarmCloudAccount')]",
-              "NGINX_BACKEND":"[parameters('ProtectedEndpoint')]",
-			  "WALLARM_API_HOST":"[parameters('WallarmCloud')]",
-			  "TARANTOOL_MEMORY_GB":"[parameters('WallarmRAMCapacity')]"
-            }
-		}
-                  }
-                }
-              ]
-            },
+						"extensions": [
+							{
+								"name": "lapextension",
+								"properties": {
+									"publisher": "Microsoft.Azure.Extensions",
+									"type": "CustomScript",
+									"typeHandlerVersion": "2.0",
+									"autoUpgradeMinorVersion": true,
+									"settings": {
+										"fileUris": "[variables('Script URLs')]"
+									},
+									"protectedSettings": {
+										"commandToExecute": "[concat(variables('Command'),' ',parameters('WallarmCloudAccount'),' ',parameters('WallarmCloudPassword'),' ',parameters('ProtectedEndpoint'),' ',parameters('WallarmRAMCapacity'),' ',parameters('WallarmPort'),' wallarm/node:',parameters('firmware'))]"
+									}
+								}
+							}
+						]
+					},
                     "diagnosticsProfile": {
                         "bootDiagnostics": {
                             "enabled": "[parameters('bootDiagnostics')]",
