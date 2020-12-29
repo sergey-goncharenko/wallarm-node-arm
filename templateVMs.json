@@ -349,7 +349,7 @@
 		"httpProbeName": "httpProbe",
 		"httpsProbeName": "httpsProbe",
 		"Script URLs": [
-		  "https://github.com/sergey-goncharenko/wallarm-node-arm/raw/main/install-docker-ubuntu.sh"
+		  "https://raw.githubusercontent.com/sergey-goncharenko/wallarm-node-arm/main/install-docker-ubuntu.sh"
 		],
 		"Command": "sh install-docker-ubuntu.sh"
     },
