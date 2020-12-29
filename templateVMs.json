@@ -349,9 +349,7 @@
 		"httpProbeName": "httpProbe",
 		"httpsProbeName": "httpsProbe",
 		"Script URLs": [
-		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/install-docker-ubuntu.sh",
-		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/install-azure-cli-ubuntu.sh",
-		  "https://raw.githubusercontent.com/vplauzon/containers/master/DockerVM/DeployVM/bootstrap-ubuntu.sh"
+		  "https://github.com/sergey-goncharenko/wallarm-node-arm/raw/main/install-docker-ubuntu.sh"
 		],
 		"Command": "sh install-docker-ubuntu.sh"
     },
