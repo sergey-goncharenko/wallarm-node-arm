@@ -32,5 +32,5 @@ apt-get update
 apt-get install docker-ce -y
 
 #	Run Hello World
-docker run -d -e WALLARM_API_HOST=\'$7\' -e DEPLOY_USER=\'$1\' -e DEPLOY_PASSWORD=\'$2\' -e NGINX_BACKEND=\'$3\' -e TARANTOOL_MEMORY_GB=$4 -p 80:$5 $6
+docker run -d -e WALLARM_API_HOST=$7 -e DEPLOY_USER=$1 -e DEPLOY_PASSWORD=$2 -e NGINX_BACKEND=$3 -e TARANTOOL_MEMORY_GB=$4 -p 80:$5 $6
 #docker run hello-world
