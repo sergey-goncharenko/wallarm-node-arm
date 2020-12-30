@@ -9,27 +9,48 @@
             },
             "maxLength": 61
         },
+		"adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Admin password on all VMs."
+            }
+        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]"
+        },
+		"WallarmCloudAccount": {
+            "type": "string"
+        },
+		"WallarmCloudPassword": {
+            "type": "secureString"
+        },
+
+        "ProtectedEndpoint": {
+            "type": "string"
+        },
+        "WallarmCloud": {
+           "type": "string",
+            "allowedValues": [
+                "us1.api.wallarm.com",
+                "api.wallarm.com"
+            ],
+            "defaultValue":"us1.api.wallarm.com"
+        },
+        "WallarmRAMCapacity": {
+            "type": "string",
+            "defaultValue":"5"
+        }
+		,
+        "WallarmPort": {
+            "type": "string",
+            "defaultValue":"80"
         },
         "vmSku": {
             "type": "string",
             "defaultValue": "Standard_D2_v2",
             "metadata": {
                 "description": "Size of VMs in the VM Scale Set."
-            }
-        },
-        "billingMethod": {
-            "type": "string",
-            "allowedValues": [
-                "18.04-LTS",
-                "16.04-LTS",
-                "hourly"
-            ],
-            "defaultValue": "18.04-LTS",
-            "metadata": {
-                "description": "Type of Deployment"
             }
         },
         "firmware": {
@@ -203,19 +224,6 @@
                 "description": "overprovisioning is true or false."
             }
         },
-        "adminPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Admin password on all VMs."
-            }
-        },
-        "wafSharedSecret": {
-            "type": "string",
-            "defaultValue": "secret",
-            "metadata": {
-                "description": "Shared secret to be used when clustering barracuda waf instances."
-            }
-        },
         "albHealthProbeProtocol": {
             "type": "string",
             "allowedValues": [
@@ -280,33 +288,8 @@
             "metadata": {
                 "description": "Persistency method to be used by the azure load balancer."
             }
-        },
-        "WallarmCloudPassword": {
-            "type": "secureString"
-        },
-        "WallarmCloudAccount": {
-            "type": "string"
-        },
-        "ProtectedEndpoint": {
-            "type": "string"
-        },
-        "WallarmCloud": {
-           "type": "string",
-            "allowedValues": [
-                "us1.api.wallarm.com",
-                "api.wallarm.com"
-            ],
-            "defaultValue":"us1.api.wallarm.com"
-        },
-        "WallarmRAMCapacity": {
-            "type": "string",
-            "defaultValue":"2"
         }
-		,
-        "WallarmPort": {
-            "type": "string",
-            "defaultValue":"80"
-        }
+
     },
     "variables": {
         "storageAccountTier": "[replace(parameters('storageAccountType'),'_LRS','')]",
@@ -326,17 +309,7 @@
         "useNewStorageAccount": "[equals(parameters('storageAccountNewOrExisting'), 'new')]",
         "useNewVnet": "[equals(parameters('vNETNewOrExisting'), 'new')]",
         "vnetID": "[resourceId(parameters('vNETResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vNETName'))]",
-        "imagePublisher": "Canonical",
-        "imageVersion": "latest",
-        "imageSKU": "[parameters('billingMethod')]",
-        "imageOffer": "UbuntuServer",
-        "imagePlan": {
-            "name": "[variables('imageSKU')]",
-            "product": "[variables('imageOffer')]",
-            "publisher": "[variables('imagePublisher')]"
-        },
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
-        "extensionName": "DockerExtension",
 		"lbName": "[concat(parameters('vmssName'), 'lb')]",
 		"bepoolName": "[concat(variables('lbName'), 'bepool')]",
 		"fepoolName": "[concat(variables('lbName'), 'fepool')]",
@@ -542,7 +515,7 @@
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('vNETName'))]"
             ],
             "sku": {
-                "name": "Standard_D2_v2",
+                "name": "[parameters('vmSku')]",
                 "capacity": "[parameters('instanceCount')]"
             },
             "properties": {
@@ -569,7 +542,7 @@
                     "priority": "Regular",
                     "osProfile": {
                         "computerNamePrefix": "[variables('namingInfix')]",
-                        "adminUsername": "will-be-replaced-by-admin",
+                        "adminUsername": "[concat(parameters('vmssName'), 'admin')]",
                         "adminPassword": "[parameters('adminPassword')]"
                     },
                     "networkProfile": {
